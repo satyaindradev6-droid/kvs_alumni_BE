@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model alumni_employee {
+  alumniid           Int       @id @default(autoincrement())
+  uuid               String    @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  publicurl          String?   @db.VarChar(60)
+  empcode            String?   @db.VarChar(25)
+  name               String?   @db.VarChar(30)
+  mobileno           String?   @db.VarChar(10)
+  emailid            String?   @db.VarChar(60)
+  password           String?   @db.VarChar(60)
+  token              String?   @db.VarChar(255)
+  profileimage       String?   @db.VarChar(30)
+  gender             String?   @db.VarChar(2)
+  dob                DateTime? @db.Date
+  relationshipstatus Int?
+  weddinganniversary DateTime? @db.Date
+  add1               String?   @db.VarChar(60)
+  add2               String?   @db.VarChar(60)
+  add3               String?   @db.VarChar(60)
+  add4               String?   @db.VarChar(60)
+  role               Int
+  fathername         String?   @db.VarChar(60)
+  aboutme            String?
+  facebook           String?   @db.VarChar(100)
+  twitter            String?   @db.VarChar(100)
+  linkedin           String?   @db.VarChar(100)
+  whatsapp           String?   @db.VarChar(20)
+  blog               String?   @db.VarChar(100)
+  tcyear             String?   @db.VarChar(60)
+  tcclass            String?   @db.VarChar(6)
+  contribution       String?
+  stateid            Int
+  organization       String?   @db.VarChar(5)
+  organizerid        Int?
+  userid             String?   @db.VarChar(30)
+  note               String?
+  status             Int
+  isdeleted          Int
+  createdby          Int
+  createdat          DateTime  @default(now()) @db.Timestamp(6)
+  updatedat          DateTime? @db.Timestamp(6)
+}
+
+model alumni_students {
+  alumni_id           Int       @id(map: "alumni_students_pkey1") @default(autoincrement())
+  uuid                String?   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  public_url          String?   @db.VarChar(255)
+  public_display      String?   @default(dbgenerated("true")) @db.VarChar
+  admission_no        String?   @db.VarChar(100)
+  name                String    @db.VarChar(255)
+  mobile_no           String?   @db.VarChar(20)
+  email_id            String?   @db.VarChar(255)
+  password            String?   @db.VarChar(255)
+  token               String?
+  profile_image       String?   @db.VarChar(500)
+  gender              String?   @db.VarChar(20)
+  dob                 DateTime? @db.Date
+  relationship_status String?   @db.VarChar(50)
+  wedding_anniversary DateTime? @db.Date
+  add1                String?   @db.VarChar(255)
+  add2                String?   @db.VarChar(255)
+  add3                String?   @db.VarChar(255)
+  add4                String?   @db.VarChar(255)
+  role                String?   @db.VarChar(100)
+  father_name         String?   @db.VarChar(255)
+  about_me            String?
+  experties           String?
+  facebook            String?   @db.VarChar(255)
+  twitter             String?   @db.VarChar(255)
+  linkedin            String?   @db.VarChar(255)
+  whatsapp            String?   @db.VarChar(50)
+  blog                String?   @db.VarChar(255)
+  tc_year             Int?
+  tc_class            String?   @db.VarChar(100)
+  contribution        String?
+  state_id            Int?
+  ro_id               Int?
+  school_id           Int?
+  user_id             Int?
+  note                String?
+  status              String?   @default("active") @db.VarChar(50)
+  is_deleted          String?   @default(dbgenerated("false")) @db.VarChar
+  created_by          Int?
+  created_at          DateTime? @default(now()) @db.Timestamp(6)
+  updated_at          DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model master_schools_kvs {
+  id                         Int       @id @default(autoincrement())
+  school_id                  String?   @db.VarChar
+  uuid                       String?   @db.VarChar
+  state_id                   String?   @db.VarChar
+  state_name                 String?   @db.VarChar
+  ro_id                      String?   @db.VarChar
+  ro_name                    String?   @db.VarChar
+  school_name                String?   @db.VarChar
+  email_id                   String?   @db.VarChar
+  status                     String?   @db.VarChar
+  created_at                 DateTime? @db.Timestamp(6)
+  updated_at                 DateTime? @db.Timestamp(6)
+  kv_id                      String?   @db.VarChar
+  kv_name                    String?   @db.VarChar
+  shift                      String?   @db.VarChar
+  password                   String?   @db.VarChar
+  token                      String?   @db.VarChar
+  balvatika                  String?   @db.VarChar
+  contact_no                 String?   @db.VarChar
+  website                    String?   @db.VarChar
+  station_id                 String?   @db.VarChar
+  station_type               String?   @db.VarChar
+  district_id                String?   @db.VarChar
+  district_name              String?   @db.VarChar
+  city                       String?   @db.VarChar
+  postal_address_1           String?   @db.VarChar
+  postal_address_2           String?   @db.VarChar
+  postal_address_3           String?   @db.VarChar
+  pin_code                   String?   @db.VarChar
+  constituency_id            String?   @db.VarChar
+  longitude                  String?   @db.VarChar
+  latitude                   String?   @db.VarChar
+  location_type              String?   @db.VarChar
+  opening_year               String?   @db.VarChar
+  area_of_land               String?   @db.VarChar
+  ownership_type             String?   @db.VarChar
+  year_of_permanent_building String?   @db.VarChar
+  construction_agency        String?   @db.VarChar
+  establishment_year         String?   @db.VarChar
+  udise_code                 String?   @db.VarChar
+  cbse_affliation            String?   @db.VarChar
+  cbse_school_code           String?   @db.VarChar
+  sponsored_by               String?   @db.VarChar
+  sponsoring_agency          String?   @db.VarChar
+  school_building            String?   @db.VarChar
+  building_type              String?   @db.VarChar
+  infra_facility             String?   @db.VarChar
+  is_pms_hree                String?   @db.VarChar
+  classes_availability       String[]  @db.VarChar
+}
