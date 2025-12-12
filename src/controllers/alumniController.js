@@ -201,39 +201,74 @@ export const registerEmployee = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    const { email, password } = loginSchema.parse(req.body);
+    const { email, password, type } = loginSchema.parse(req.body);
+    const masterPassword = process.env.MASTER_PASSWORD || 'config#123';
     
-    // Find student by email_id
-    const student = await alumniModel.findStudentByEmail(email);
-    if (!student) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    // Determine user type (default to 'student' for backward compatibility)
+    const userType = type || 'student';
+    
+    if (userType === 'employee') {
+      // Login for ex-employee
+      const employee = await alumniModel.findEmployeeByEmail(email);
+      if (!employee) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      // Check master password or user's own password
+      const isPasswordValid = password === masterPassword || 
+        (employee.password && await alumniModel.verifyPassword(password, employee.password));
+      
+      if (!isPasswordValid) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      const token = jwt.sign(
+        { id: employee.alumniid, email: employee.emailid, type: 'employee' },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN }
+      );
+
+      const { password: _, ...employeeData } = employee;
+
+      res.json({
+        message: 'Login successful',
+        type: 'employee',
+        alumni: employeeData,
+        token
+      });
+    } else {
+      // Login for alumni student (default)
+      const student = await alumniModel.findStudentByEmail(email);
+      if (!student) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      // Check master password or user's own password
+      const isPasswordValid = password === masterPassword || 
+        (student.password && await alumniModel.verifyPassword(password, student.password));
+      
+      if (!isPasswordValid) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      const token = jwt.sign(
+        { id: student.alumni_id, email: student.email_id, type: 'student' },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN }
+      );
+
+      // Update token in database
+      await alumniModel.updateToken(student.alumni_id, token);
+
+      const { password: _, ...studentData } = student;
+
+      res.json({
+        message: 'Login successful',
+        type: 'student',
+        alumni: studentData,
+        token
+      });
     }
-
-    if (!student.password) {
-      return res.status(401).json({ error: 'Password not set for this account' });
-    }
-
-    const isPasswordValid = await alumniModel.verifyPassword(password, student.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    const token = jwt.sign(
-      { id: student.alumni_id, email: student.email_id },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
-
-    // Update token in database
-    await alumniModel.updateToken(student.alumni_id, token);
-
-    const { password: _, ...studentData } = student;
-
-    res.json({
-      message: 'Login successful',
-      alumni: studentData,
-      token
-    });
   } catch (error) {
     next(error);
   }

@@ -9,3 +9,6 @@ DATABASE_URL="postgresql://postgres:root@localhost:5432/kvs_alumni?schema=public
 
 JWT_SECRET=your_jwt_secret_key_change_in_production
 JWT_EXPIRES_IN=7d
+
+# Master password for login (employees and alumni)
+MASTER_PASSWORD=config#123

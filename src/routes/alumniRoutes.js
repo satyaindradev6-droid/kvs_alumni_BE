@@ -12,7 +12,7 @@ router.post('/register-employee', upload.single('photo'), alumniController.regis
 // Public routes
 router.post('/login', alumniController.login);
 router.get('/all', alumniController.getAllAlumni);
-router.get('/:id', alumniController.getAlumniById);
+router.get('/:id', authenticate, alumniController.getAlumniById);
 
 // Protected routes
 router.get('/profile/me', authenticate, alumniController.getProfile);

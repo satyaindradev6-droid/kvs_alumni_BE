@@ -201,6 +201,7 @@ export const updateAlumniSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.string().optional(),
-  password: z.string().optional(),
+  email: z.string().min(1, 'Email is required'),
+  password: z.string().min(1, 'Password is required'),
+  type: z.enum(['student', 'employee']).optional(), // 'student' for alumni, 'employee' for ex-employee
 });
