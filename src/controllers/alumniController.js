@@ -3,7 +3,8 @@ import {
   updateAlumniSchema, 
   loginSchema,
   registerStudentSchema,
-  registerEmployeeSchema 
+  registerEmployeeSchema,
+  forgotPasswordSchema 
 } from '../validations/alumniValidation.js';
 import jwt from 'jsonwebtoken';
 
@@ -361,6 +362,60 @@ export const deleteAccount = async (req, res, next) => {
     await alumniModel.deleteAlumniStudent(req.user.id);
     res.json({ message: 'Account deleted successfully' });
   } catch (error) {
+    next(error);
+  }
+};
+
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = forgotPasswordSchema.parse(req.body);
+
+    // Import utilities
+    const { generateStrongPassword } = await import('../utils/passwordGenerator.js');
+    const { sendPasswordResetEmail } = await import('../utils/emailService.js');
+    const bcrypt = await import('bcrypt');
+
+    // Check if user exists (student or employee)
+    const student = await alumniModel.findStudentByEmail(email);
+    const employee = await alumniModel.findEmployeeByEmail(email);
+    
+    if (!student && !employee) {
+      // Don't reveal if email exists or not for security
+      return res.json({
+        success: true,
+        message: 'If the email is valid, a new password has been sent.'
+      });
+    }
+
+    // Generate strong password (10-12 characters)
+    const passwordLength = Math.floor(Math.random() * 3) + 10; // Random between 10-12
+    const newPassword = generateStrongPassword(passwordLength);
+    
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
+    // Update password in database
+    if (student) {
+      await alumniModel.updateStudentPassword(email, hashedPassword);
+    } else if (employee) {
+      await alumniModel.updateEmployeePassword(email, hashedPassword);
+    }
+    
+    // Send email with new password
+    const emailResult = await sendPasswordResetEmail(email, newPassword);
+    
+    if (!emailResult.success) {
+      console.error('Failed to send password reset email:', emailResult.error);
+      // Still return success to not reveal email existence
+    }
+
+    res.json({
+      success: true,
+      message: 'If the email is valid, a new password has been sent.'
+    });
+    
+  } catch (error) {
+    console.error('Forgot password error:', error);
     next(error);
   }
 };

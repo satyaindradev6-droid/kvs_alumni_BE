@@ -30,8 +30,10 @@ app.get('/', (req, res) => {
     message: 'KVS Alumni Portal API',
     version: '1.0.0',
     endpoints: {
-      register: 'POST /api/alumni/register',
+      registerStudent: 'POST /api/alumni/register-student',
+      registerEmployee: 'POST /api/alumni/register-employee',
       login: 'POST /api/alumni/login',
+      forgotPassword: 'POST /api/alumni/forgot-password',
       profile: 'GET /api/alumni/profile/me',
       updateProfile: 'PUT /api/alumni/profile/me',
       uploadPhoto: 'POST /api/alumni/profile/photo',

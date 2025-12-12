@@ -187,6 +187,34 @@ export const verifyPassword = async (plainPassword, hashedPassword) => {
   return await bcrypt.compare(plainPassword, hashedPassword);
 };
 
+// Update password for student
+export const updateStudentPassword = async (email_id, hashedPassword) => {
+  return await prisma.alumni_students.updateMany({
+    where: { 
+      email_id, 
+      is_deleted: 'false' 
+    },
+    data: { 
+      password: hashedPassword, 
+      updated_at: new Date() 
+    },
+  });
+};
+
+// Update password for employee
+export const updateEmployeePassword = async (emailid, hashedPassword) => {
+  return await prisma.alumni_employee.updateMany({
+    where: { 
+      emailid, 
+      isdeleted: 0 
+    },
+    data: { 
+      password: hashedPassword, 
+      updatedat: new Date() 
+    },
+  });
+};
+
 // ============ ALUMNI EMPLOYEE FUNCTIONS ============
 
 // Field selection for alumni_employee

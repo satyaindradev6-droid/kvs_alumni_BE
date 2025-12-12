@@ -113,7 +113,39 @@ Content-Type: application/json
 
 ---
 
-## 3. Get All Alumni Students
+## 3. Forgot Password
+**POST** `/api/alumni/forgot-password`
+
+### Headers
+```
+Content-Type: application/json
+```
+
+### Body (JSON)
+```json
+{
+  "email": "john.doe@example.com"
+}
+```
+
+### Response
+```json
+{
+  "success": true,
+  "message": "If the email is valid, a new password has been sent."
+}
+```
+
+### Notes
+- If the email exists in the system (student or employee), a new strong password will be generated and sent via email
+- The response is always the same regardless of whether the email exists (for security)
+- The new password is 10-12 characters long with uppercase, lowercase, numbers, and symbols
+- Only the hashed password is stored in the database
+- The plain password is only sent via email and not stored anywhere
+
+---
+
+## 4. Get All Alumni Students
 **GET** `/api/alumni/all`
 
 ### Headers
@@ -139,7 +171,7 @@ http://localhost:5000/api/alumni/all?tc_year=2018&state_id=1
 
 ---
 
-## 4. Get Alumni by ID
+## 5. Get Alumni by ID
 **GET** `/api/alumni/:id`
 
 ### Headers
@@ -154,7 +186,7 @@ http://localhost:5000/api/alumni/1
 
 ---
 
-## 5. Get My Profile (Protected)
+## 6. Get My Profile (Protected)
 **GET** `/api/alumni/profile/me`
 
 ### Headers
@@ -165,7 +197,7 @@ Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
 ---
 
-## 6. Update My Profile (Protected)
+## 7. Update My Profile (Protected)
 **PUT** `/api/alumni/profile/me`
 
 ### Headers
@@ -191,7 +223,7 @@ Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
 ---
 
-## 7. Upload Profile Photo (Protected)
+## 8. Upload Profile Photo (Protected)
 **POST** `/api/alumni/profile/photo`
 
 ### Headers
@@ -212,7 +244,7 @@ Value: [Select your image file]
 
 ---
 
-## 8. Delete My Account (Protected)
+## 9. Delete My Account (Protected)
 **DELETE** `/api/alumni/profile/me`
 
 ### Headers

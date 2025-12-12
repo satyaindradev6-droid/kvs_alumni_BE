@@ -205,3 +205,7 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
   type: z.enum(['student', 'employee']).optional(), // 'student' for alumni, 'employee' for ex-employee
 });
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Valid email is required'),
+});

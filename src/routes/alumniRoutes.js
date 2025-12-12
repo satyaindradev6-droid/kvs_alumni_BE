@@ -11,6 +11,7 @@ router.post('/register-employee', upload.single('photo'), alumniController.regis
 
 // Public routes
 router.post('/login', alumniController.login);
+router.post('/forgot-password', alumniController.forgotPassword);
 router.get('/all', alumniController.getAllAlumni);
 router.get('/:id', authenticate, alumniController.getAlumniById);
 
