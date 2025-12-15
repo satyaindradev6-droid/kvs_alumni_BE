@@ -13,7 +13,7 @@ router.post('/register-employee', upload.single('photo'), alumniController.regis
 router.post('/login', alumniController.login);
 router.post('/forgot-password', alumniController.forgotPassword);
 router.get('/all', alumniController.getAllAlumni);
-router.get('/:id', authenticate, alumniController.getAlumniById);
+router.get('/:id', alumniController.getAlumniById);
 
 // Protected routes
 router.get('/profile/me', authenticate, alumniController.getProfile);

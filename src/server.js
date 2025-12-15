@@ -15,9 +15,14 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || '0.0.0.0';
+const LAN_IP = process.env.LAN_IP;
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:5000', `http://${LAN_IP}:5000`, `http://${LAN_IP}:3000`],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -56,8 +61,13 @@ app.use((req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+app.listen(PORT, HOST, () => {
+  console.log(`🚀 Server running on:`);
+  console.log(`   Local:   http://localhost:${PORT}`);
+  if (LAN_IP) {
+    console.log(`   Network: http://${LAN_IP}:${PORT}`);
+  }
+  console.log(`   Host:    http://${HOST}:${PORT}`);
 });
 
 // Graceful shutdown

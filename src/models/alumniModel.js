@@ -318,3 +318,36 @@ export const findEmployeeById = async (alumniid) => {
     select: alumniEmployeeSelect,
   });
 };
+
+// Find alumni by ID (searches both student and employee tables)
+export const findAlumniById = async (id) => {
+  const numericId = parseInt(id);
+  
+  // First try to find in students table
+  const student = await prisma.alumni_students.findUnique({
+    where: { alumni_id: numericId },
+    select: alumniStudentSelect,
+  });
+  
+  if (student) {
+    return {
+      type: 'student',
+      data: student
+    };
+  }
+  
+  // If not found in students, try employees table
+  const employee = await prisma.alumni_employee.findUnique({
+    where: { alumniid: numericId },
+    select: alumniEmployeeSelect,
+  });
+  
+  if (employee) {
+    return {
+      type: 'employee',
+      data: employee
+    };
+  }
+  
+  return null;
+};

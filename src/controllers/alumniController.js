@@ -312,12 +312,18 @@ export const getAllAlumni = async (req, res, next) => {
 
 export const getAlumniById = async (req, res, next) => {
   try {
-    const student = await alumniModel.findStudentById(req.params.id);
-    if (!student) {
+    const alumni = await alumniModel.findAlumniById(req.params.id);
+    if (!alumni) {
       return res.status(404).json({ error: 'Alumni not found' });
     }
-    const { password: _, ...studentData } = student;
-    res.json(studentData);
+    
+    // Remove password from response if it exists
+    const { password: _, ...alumniData } = alumni.data;
+    
+    res.json({
+      type: alumni.type,
+      alumni: alumniData
+    });
   } catch (error) {
     next(error);
   }
