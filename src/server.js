@@ -19,8 +19,21 @@ const HOST = process.env.HOST || '0.0.0.0';
 const LAN_IP = process.env.LAN_IP;
 
 // Middlewares
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5000'
+];
+
+// Add LAN IP origins if available
+if (LAN_IP) {
+  allowedOrigins.push(`http://${LAN_IP}:5000`);
+  allowedOrigins.push(`http://${LAN_IP}:3000`);
+}
+
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5000', `http://${LAN_IP}:5000`, `http://${LAN_IP}:3000`],
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json());
@@ -39,12 +52,24 @@ app.get('/', (req, res) => {
       registerEmployee: 'POST /api/alumni/register-employee',
       login: 'POST /api/alumni/login',
       forgotPassword: 'POST /api/alumni/forgot-password',
+      // Generic profile endpoints
       profile: 'GET /api/alumni/profile/me',
       updateProfile: 'PUT /api/alumni/profile/me',
       uploadPhoto: 'POST /api/alumni/profile/photo',
+      deleteAccount: 'DELETE /api/alumni/profile/me',
+      // Student-specific endpoints
+      studentProfile: 'GET /api/alumni/student/profile/me',
+      updateStudentProfile: 'PUT /api/alumni/student/profile/me',
+      studentProfileById: 'GET /api/alumni/student/profile/:alumni_id',
+      updateStudentProfileById: 'PUT /api/alumni/student/profile/:alumni_id',
+      // Employee-specific endpoints
+      employeeProfile: 'GET /api/alumni/employee/profile/me',
+      updateEmployeeProfile: 'PUT /api/alumni/employee/profile/me',
+      employeeProfileById: 'GET /api/alumni/employee/profile/:alumni_id',
+      updateEmployeeProfileById: 'PUT /api/alumni/employee/profile/:alumni_id',
+      // Other endpoints
       getAllAlumni: 'GET /api/alumni/all',
-      getAlumniById: 'GET /api/alumni/:id',
-      deleteAccount: 'DELETE /api/alumni/profile/me'
+      getAlumniById: 'GET /api/alumni/:id'
     }
   });
 });

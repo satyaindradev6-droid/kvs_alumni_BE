@@ -1,6 +1,7 @@
 import * as alumniModel from '../models/alumniModel.js';
 import { 
-  updateAlumniSchema, 
+  updateAlumniSchema,
+  updateEmployeeSchema, 
   loginSchema,
   registerStudentSchema,
   registerEmployeeSchema,
@@ -70,11 +71,11 @@ export const registerEmployee = async (req, res, next) => {
     // Normalize field names (handle both snake_case and camelCase)
     const normalizedData = {
       name: validatedData.name,
-      fathername: validatedData.fathername || validatedData.father_name,
-      mobileno: validatedData.mobileno || validatedData.mobile_no || validatedData.mobile_number,
-      emailid: validatedData.emailid || validatedData.email_id || validatedData.email,
-      empcode: validatedData.empcode || validatedData.employee_code,
-      tcyear: validatedData.tcyear || validatedData.retirement_year,
+      father_name: validatedData.fathername || validatedData.father_name,
+      mobile_no: validatedData.mobileno || validatedData.mobile_no || validatedData.mobile_number,
+      email_id: validatedData.emailid || validatedData.email_id || validatedData.email,
+      emp_code: validatedData.empcode || validatedData.employee_code,
+      tc_year: validatedData.tcyear || validatedData.retirement_year,
     };
     
     // Validate required fields
@@ -85,34 +86,34 @@ export const registerEmployee = async (req, res, next) => {
       errors.push({ field: 'name', message: 'Name must be 30 characters or less' });
     }
     
-    if (!normalizedData.fathername) {
-      errors.push({ field: 'fathername', message: 'Father name is required' });
-    } else if (normalizedData.fathername.length > 60) {
-      errors.push({ field: 'fathername', message: 'Father name must be 60 characters or less' });
+    if (!normalizedData.father_name) {
+      errors.push({ field: 'father_name', message: 'Father name is required' });
+    } else if (normalizedData.father_name.length > 60) {
+      errors.push({ field: 'father_name', message: 'Father name must be 60 characters or less' });
     }
     
-    if (!normalizedData.mobileno) {
-      errors.push({ field: 'mobileno', message: 'Mobile number is required' });
-    } else if (normalizedData.mobileno.length !== 10) {
-      errors.push({ field: 'mobileno', message: 'Mobile number must be exactly 10 digits' });
+    if (!normalizedData.mobile_no) {
+      errors.push({ field: 'mobile_no', message: 'Mobile number is required' });
+    } else if (normalizedData.mobile_no.length !== 10) {
+      errors.push({ field: 'mobile_no', message: 'Mobile number must be exactly 10 digits' });
     }
     
-    if (!normalizedData.emailid) {
-      errors.push({ field: 'emailid', message: 'Email is required' });
-    } else if (normalizedData.emailid.length > 60) {
-      errors.push({ field: 'emailid', message: 'Email must be 60 characters or less' });
+    if (!normalizedData.email_id) {
+      errors.push({ field: 'email_id', message: 'Email is required' });
+    } else if (normalizedData.email_id.length > 60) {
+      errors.push({ field: 'email_id', message: 'Email must be 60 characters or less' });
     }
     
-    if (!normalizedData.empcode) {
-      errors.push({ field: 'empcode', message: 'Employee code is required' });
-    } else if (normalizedData.empcode.length > 25) {
-      errors.push({ field: 'empcode', message: 'Employee code must be 25 characters or less' });
+    if (!normalizedData.emp_code) {
+      errors.push({ field: 'emp_code', message: 'Employee code is required' });
+    } else if (normalizedData.emp_code.length > 25) {
+      errors.push({ field: 'emp_code', message: 'Employee code must be 25 characters or less' });
     }
     
-    if (!normalizedData.tcyear) {
-      errors.push({ field: 'tcyear', message: 'Retirement year is required' });
-    } else if (normalizedData.tcyear.length > 60) {
-      errors.push({ field: 'tcyear', message: 'Retirement year must be 60 characters or less' });
+    if (!normalizedData.tc_year) {
+      errors.push({ field: 'tc_year', message: 'Retirement year is required' });
+    } else if (normalizedData.tc_year.length > 60) {
+      errors.push({ field: 'tc_year', message: 'Retirement year must be 60 characters or less' });
     }
     
     if (!req.file) {
@@ -124,13 +125,13 @@ export const registerEmployee = async (req, res, next) => {
     }
     
     // Check if email exists
-    const existingEmail = await alumniModel.findEmployeeByEmail(normalizedData.emailid);
+    const existingEmail = await alumniModel.findEmployeeByEmail(normalizedData.email_id);
     if (existingEmail) {
       return res.status(409).json({ error: 'Email already registered' });
     }
 
     // Check if employee code exists
-    const existingCode = await alumniModel.findEmployeeByCode(normalizedData.empcode);
+    const existingCode = await alumniModel.findEmployeeByCode(normalizedData.emp_code);
     if (existingCode) {
       return res.status(409).json({ error: 'Employee code already exists' });
     }
@@ -138,30 +139,30 @@ export const registerEmployee = async (req, res, next) => {
     // Add profile image - store only filename (max 30 chars in DB)
     // Truncate filename if too long
     const filename = req.file.filename;
-    normalizedData.profileimage = filename.length > 30 ? filename.substring(0, 30) : filename;
+    normalizedData.profile_image = filename.length > 30 ? filename.substring(0, 30) : filename;
     
     // Add optional fields if present with length limits
     // Password is not required for registration - removed
     if (validatedData.publicurl || validatedData.public_url) {
       const url = validatedData.publicurl || validatedData.public_url;
-      normalizedData.publicurl = url.substring(0, 60);
+      normalizedData.public_url = url.substring(0, 60);
     }
     if (validatedData.gender) {
       normalizedData.gender = validatedData.gender.substring(0, 2);
     }
     if (validatedData.dob) normalizedData.dob = validatedData.dob;
     if (validatedData.relationshipstatus || validatedData.relationship_status) {
-      normalizedData.relationshipstatus = validatedData.relationshipstatus || validatedData.relationship_status;
+      normalizedData.relationship_status = validatedData.relationshipstatus || validatedData.relationship_status;
     }
     if (validatedData.weddinganniversary || validatedData.wedding_anniversary) {
-      normalizedData.weddinganniversary = validatedData.weddinganniversary || validatedData.wedding_anniversary;
+      normalizedData.wedding_anniversary = validatedData.weddinganniversary || validatedData.wedding_anniversary;
     }
     if (validatedData.add1) normalizedData.add1 = validatedData.add1.substring(0, 60);
     if (validatedData.add2) normalizedData.add2 = validatedData.add2.substring(0, 60);
     if (validatedData.add3) normalizedData.add3 = validatedData.add3.substring(0, 60);
     if (validatedData.add4) normalizedData.add4 = validatedData.add4.substring(0, 60);
     if (validatedData.aboutme || validatedData.about_me) {
-      normalizedData.aboutme = validatedData.aboutme || validatedData.about_me;
+      normalizedData.about_me = validatedData.aboutme || validatedData.about_me;
     }
     if (validatedData.facebook) normalizedData.facebook = validatedData.facebook.substring(0, 100);
     if (validatedData.twitter) normalizedData.twitter = validatedData.twitter.substring(0, 100);
@@ -170,22 +171,22 @@ export const registerEmployee = async (req, res, next) => {
     if (validatedData.blog) normalizedData.blog = validatedData.blog.substring(0, 100);
     if (validatedData.tcclass || validatedData.tc_class) {
       const tcclass = validatedData.tcclass || validatedData.tc_class;
-      normalizedData.tcclass = tcclass.substring(0, 6);
+      normalizedData.tc_class = tcclass.substring(0, 6);
     }
     if (validatedData.contribution) normalizedData.contribution = validatedData.contribution;
     if (validatedData.stateid || validatedData.state_id) {
-      normalizedData.stateid = validatedData.stateid || validatedData.state_id;
+      normalizedData.state_id = validatedData.stateid || validatedData.state_id;
     }
     if (validatedData.organization) {
       // Organization field is limited to 5 characters in DB
       normalizedData.organization = validatedData.organization.substring(0, 5);
     }
     if (validatedData.organizerid || validatedData.organizer_id) {
-      normalizedData.organizerid = validatedData.organizerid || validatedData.organizer_id;
+      normalizedData.organizer_id = validatedData.organizerid || validatedData.organizer_id;
     }
     if (validatedData.userid || validatedData.user_id) {
       const userid = validatedData.userid || validatedData.user_id;
-      normalizedData.userid = userid.substring(0, 30);
+      normalizedData.user_id = userid.substring(0, 30);
     }
     if (validatedData.note) normalizedData.note = validatedData.note;
 
@@ -224,7 +225,7 @@ export const login = async (req, res, next) => {
       }
 
       const token = jwt.sign(
-        { id: employee.alumniid, email: employee.emailid, type: 'employee' },
+        { id: employee.alumni_id, email: employee.email_id, type: 'employee' },
         process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN }
       );
@@ -275,14 +276,58 @@ export const login = async (req, res, next) => {
   }
 };
 
-export const getProfile = async (req, res, next) => {
+export const getStudentProfile = async (req, res, next) => {
   try {
     const student = await alumniModel.findStudentById(req.user.id);
     if (!student) {
-      return res.status(404).json({ error: 'Alumni not found' });
+      return res.status(404).json({ error: 'Student not found' });
     }
     const { password: _, ...studentData } = student;
-    res.json(studentData);
+    res.json({
+      type: 'student',
+      alumni: studentData
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getEmployeeProfile = async (req, res, next) => {
+  try {
+    const employee = await alumniModel.findEmployeeById(req.user.id);
+    if (!employee) {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
+    const { password: _, ...employeeData } = employee;
+    res.json({
+      type: 'employee',
+      alumni: employeeData
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Backward compatibility - determines user type and calls appropriate function
+export const getProfile = async (req, res, next) => {
+  try {
+    // Check if user is student or employee based on ID format
+    const userId = req.user.id;
+    
+    if (typeof userId === 'string' && userId.startsWith('S')) {
+      // Student profile
+      return getStudentProfile(req, res, next);
+    } else if (typeof userId === 'string' && userId.startsWith('E')) {
+      // Employee profile
+      return getEmployeeProfile(req, res, next);
+    } else {
+      // Legacy support - try to determine from user type in token
+      if (req.user.type === 'employee') {
+        return getEmployeeProfile(req, res, next);
+      } else {
+        return getStudentProfile(req, res, next);
+      }
+    }
   } catch (error) {
     next(error);
   }
@@ -312,7 +357,14 @@ export const getAllAlumni = async (req, res, next) => {
 
 export const getAlumniById = async (req, res, next) => {
   try {
-    const alumni = await alumniModel.findAlumniById(req.params.id);
+    const id = req.params.id;
+    
+    // Validate ID format - accept student IDs (S1, S2, etc.) or employee IDs (E1, E2, etc.)
+    if (!/^(S\d+|E\d+)$/.test(id)) {
+      return res.status(400).json({ error: 'Invalid ID format. ID must be a student ID (S1, S2, etc.) or employee ID (E1, E2, etc.).' });
+    }
+    
+    const alumni = await alumniModel.findAlumniById(id);
     if (!alumni) {
       return res.status(404).json({ error: 'Alumni not found' });
     }
@@ -329,17 +381,238 @@ export const getAlumniById = async (req, res, next) => {
   }
 };
 
-export const updateProfile = async (req, res, next) => {
+export const updateStudentProfile = async (req, res, next) => {
   try {
+    console.log('=== UPDATE STUDENT PROFILE DEBUG ===');
+    console.log('User from JWT:', req.user);
+    console.log('User ID:', req.user.id);
+    console.log('Request body:', req.body);
+    console.log('===================================');
+    
     const validatedData = updateAlumniSchema.parse(req.body);
     const student = await alumniModel.updateAlumniStudent(req.user.id, validatedData);
     
     const { password: _, ...studentData } = student;
     
     res.json({
-      message: 'Profile updated successfully',
+      message: 'Student profile updated successfully',
+      type: 'student',
       alumni: studentData
     });
+  } catch (error) {
+    console.error('Update student profile error:', error);
+    next(error);
+  }
+};
+
+export const updateEmployeeProfile = async (req, res, next) => {
+  try {
+    console.log('=== UPDATE EMPLOYEE PROFILE DEBUG ===');
+    console.log('User from JWT:', req.user);
+    console.log('User ID:', req.user.id);
+    console.log('Request body:', req.body);
+    console.log('====================================');
+    
+    const validatedData = updateEmployeeSchema.parse(req.body);
+    const employee = await alumniModel.updateAlumniEmployee(req.user.id, validatedData);
+    
+    const { password: _, ...employeeData } = employee;
+    
+    res.json({
+      message: 'Employee profile updated successfully',
+      type: 'employee',
+      alumni: employeeData
+    });
+  } catch (error) {
+    console.error('Update employee profile error:', error);
+    next(error);
+  }
+};
+
+// Get student profile by alumni_id from URL parameter
+export const getStudentProfileById = async (req, res, next) => {
+  try {
+    const { alumni_id } = req.params;
+    
+    // Validate alumni_id format (should start with 'S')
+    if (!alumni_id.startsWith('S')) {
+      return res.status(400).json({ error: 'Invalid student alumni_id format. Must start with "S"' });
+    }
+    
+    console.log('=== GET STUDENT PROFILE BY ID ===');
+    console.log('Alumni ID from URL:', alumni_id);
+    console.log('User from JWT:', req.user);
+    console.log('================================');
+    
+    const student = await alumniModel.findStudentById(alumni_id);
+    if (!student) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+    
+    const { password: _, ...studentData } = student;
+    res.json({
+      type: 'student',
+      alumni: studentData
+    });
+  } catch (error) {
+    console.error('Get student profile by ID error:', error);
+    next(error);
+  }
+};
+
+// Update student profile by alumni_id from URL parameter
+export const updateStudentProfileById = async (req, res, next) => {
+  try {
+    const { alumni_id } = req.params;
+    
+    // Validate alumni_id format (should start with 'S')
+    if (!alumni_id.startsWith('S')) {
+      return res.status(400).json({ error: 'Invalid student alumni_id format. Must start with "S"' });
+    }
+    
+    console.log('=== UPDATE STUDENT PROFILE BY ID ===');
+    console.log('Alumni ID from URL:', alumni_id);
+    console.log('User from JWT:', req.user);
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+    console.log('Request body keys:', Object.keys(req.body));
+    console.log('Email field value:', JSON.stringify(req.body.email_id));
+    console.log('Email field type:', typeof req.body.email_id);
+    console.log('===================================');
+    
+    try {
+      const validatedData = updateAlumniSchema.parse(req.body);
+      console.log('✅ Validation passed:', validatedData);
+    } catch (validationError) {
+      console.log('❌ Validation failed:', validationError.message);
+      console.log('Validation errors:', validationError.errors);
+      return res.status(400).json({
+        error: 'Validation failed',
+        details: validationError.errors.map(err => ({
+          field: err.path.join('.') || 'unknown',
+          message: err.message
+        }))
+      });
+    }
+    
+    const validatedData = updateAlumniSchema.parse(req.body);
+    
+    // First check if student exists
+    const existingStudent = await alumniModel.findStudentById(alumni_id);
+    if (!existingStudent) {
+      return res.status(404).json({ 
+        error: 'Student not found',
+        message: `No student found with alumni_id: ${alumni_id}`
+      });
+    }
+    
+    const student = await alumniModel.updateAlumniStudent(alumni_id, validatedData);
+    
+    const { password: _, ...studentData } = student;
+    
+    res.json({
+      message: 'Student profile updated successfully',
+      type: 'student',
+      alumni: studentData
+    });
+  } catch (error) {
+    console.error('Update student profile by ID error:', error);
+    next(error);
+  }
+};
+
+// Get employee profile by alumni_id from URL parameter
+export const getEmployeeProfileById = async (req, res, next) => {
+  try {
+    const { alumni_id } = req.params;
+    
+    // Validate alumni_id format (should start with 'E')
+    if (!alumni_id.startsWith('E')) {
+      return res.status(400).json({ error: 'Invalid employee alumni_id format. Must start with "E"' });
+    }
+    
+    console.log('=== GET EMPLOYEE PROFILE BY ID ===');
+    console.log('Alumni ID from URL:', alumni_id);
+    console.log('User from JWT:', req.user);
+    console.log('=================================');
+    
+    const employee = await alumniModel.findEmployeeById(alumni_id);
+    if (!employee) {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
+    
+    const { password: _, ...employeeData } = employee;
+    res.json({
+      type: 'employee',
+      alumni: employeeData
+    });
+  } catch (error) {
+    console.error('Get employee profile by ID error:', error);
+    next(error);
+  }
+};
+
+// Update employee profile by alumni_id from URL parameter
+export const updateEmployeeProfileById = async (req, res, next) => {
+  try {
+    const { alumni_id } = req.params;
+    
+    // Validate alumni_id format (should start with 'E')
+    if (!alumni_id.startsWith('E')) {
+      return res.status(400).json({ error: 'Invalid employee alumni_id format. Must start with "E"' });
+    }
+    
+    console.log('=== UPDATE EMPLOYEE PROFILE BY ID ===');
+    console.log('Alumni ID from URL:', alumni_id);
+    console.log('User from JWT:', req.user);
+    console.log('Request body:', req.body);
+    console.log('====================================');
+    
+    const validatedData = updateEmployeeSchema.parse(req.body);
+    
+    // First check if employee exists
+    const existingEmployee = await alumniModel.findEmployeeById(alumni_id);
+    if (!existingEmployee) {
+      return res.status(404).json({ 
+        error: 'Employee not found',
+        message: `No employee found with alumni_id: ${alumni_id}`
+      });
+    }
+    
+    const employee = await alumniModel.updateAlumniEmployee(alumni_id, validatedData);
+    
+    const { password: _, ...employeeData } = employee;
+    
+    res.json({
+      message: 'Employee profile updated successfully',
+      type: 'employee',
+      alumni: employeeData
+    });
+  } catch (error) {
+    console.error('Update employee profile by ID error:', error);
+    next(error);
+  }
+};
+
+// Backward compatibility - determines user type and calls appropriate function
+export const updateProfile = async (req, res, next) => {
+  try {
+    // Check if user is student or employee based on ID format
+    const userId = req.user.id;
+    
+    if (typeof userId === 'string' && userId.startsWith('S')) {
+      // Student update
+      return updateStudentProfile(req, res, next);
+    } else if (typeof userId === 'string' && userId.startsWith('E')) {
+      // Employee update
+      return updateEmployeeProfile(req, res, next);
+    } else {
+      // Legacy support - try to determine from user type in token
+      if (req.user.type === 'employee') {
+        return updateEmployeeProfile(req, res, next);
+      } else {
+        return updateStudentProfile(req, res, next);
+      }
+    }
   } catch (error) {
     next(error);
   }

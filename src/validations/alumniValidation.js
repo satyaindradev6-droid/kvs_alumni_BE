@@ -79,8 +79,10 @@ export const registerEmployeeSchema = z.object({
   email_id: z.string().optional(),
   email: z.string().optional(),
   empcode: z.string().optional(),
+  emp_code: z.string().optional(),
   employee_code: z.string().optional(),
   tcyear: z.string().optional(),
+  tc_year: z.string().optional(),
   retirement_year: z.string().optional(),
   
   // Optional fields
@@ -171,7 +173,7 @@ export const updateAlumniSchema = z.object({
   admission_no: z.string().optional(),
   name: z.string().min(2).optional(),
   mobile_no: z.string().optional(),
-  email_id: z.string().email().optional(),
+  email_id: z.union([z.string().email(), z.literal('')]).optional(),
   gender: z.string().optional(),
   dob: z.string().optional(),
   relationship_status: z.string().optional(),
@@ -189,15 +191,103 @@ export const updateAlumniSchema = z.object({
   linkedin: z.string().optional(),
   whatsapp: z.string().optional(),
   blog: z.string().optional(),
-  tc_year: z.number().int().optional(),
+  tc_year: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    if (typeof val === 'string') {
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? undefined : parsed;
+    }
+    return val;
+  }, z.number().int().optional()),
   tc_class: z.string().optional(),
   contribution: z.string().optional(),
-  state_id: z.number().int().optional(),
-  ro_id: z.number().int().optional(),
-  school_id: z.number().int().optional(),
-  user_id: z.number().int().optional(),
+  state_id: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    if (typeof val === 'string') {
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? undefined : parsed;
+    }
+    return val;
+  }, z.number().int().optional()),
+  ro_id: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    if (typeof val === 'string') {
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? undefined : parsed;
+    }
+    return val;
+  }, z.number().int().optional()),
+  school_id: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    if (typeof val === 'string') {
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? undefined : parsed;
+    }
+    return val;
+  }, z.number().int().optional()),
+  user_id: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    if (typeof val === 'string') {
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? undefined : parsed;
+    }
+    return val;
+  }, z.number().int().optional()),
   note: z.string().optional(),
   status: z.string().optional(),
+});
+
+export const updateEmployeeSchema = z.object({
+  public_url: z.string().optional(),
+  emp_code: z.string().optional(),
+  name: z.string().min(2).optional(),
+  mobile_no: z.string().optional(),
+  email_id: z.string().email().optional(),
+  password: z.string().min(6, 'Password must be at least 6 characters').optional(),
+  gender: z.string().optional(),
+  dob: z.string().optional(),
+  relationship_status: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    if (typeof val === 'string') {
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? undefined : parsed;
+    }
+    return val;
+  }, z.number().int().optional()),
+  wedding_anniversary: z.string().optional(),
+  add1: z.string().optional(),
+  add2: z.string().optional(),
+  add3: z.string().optional(),
+  add4: z.string().optional(),
+  father_name: z.string().optional(),
+  about_me: z.string().optional(),
+  facebook: z.string().optional(),
+  twitter: z.string().optional(),
+  linkedin: z.string().optional(),
+  whatsapp: z.string().optional(),
+  blog: z.string().optional(),
+  tc_year: z.string().optional(),
+  tc_class: z.string().optional(),
+  contribution: z.string().optional(),
+  state_id: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    if (typeof val === 'string') {
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? undefined : parsed;
+    }
+    return val;
+  }, z.number().int().optional()),
+  organization: z.string().optional(),
+  organizer_id: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    if (typeof val === 'string') {
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? undefined : parsed;
+    }
+    return val;
+  }, z.number().int().optional()),
+  user_id: z.string().optional(),
+  note: z.string().optional(),
 });
 
 export const loginSchema = z.object({

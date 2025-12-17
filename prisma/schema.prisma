@@ -8,49 +8,48 @@ datasource db {
 }
 
 model alumni_employee {
-  alumniid           Int       @id @default(autoincrement())
-  uuid               String    @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  publicurl          String?   @db.VarChar(60)
-  empcode            String?   @db.VarChar(25)
-  name               String?   @db.VarChar(30)
-  mobileno           String?   @db.VarChar(10)
-  emailid            String?   @db.VarChar(60)
-  password           String?   @db.VarChar(60)
-  token              String?   @db.VarChar(255)
-  profileimage       String?   @db.VarChar(30)
-  gender             String?   @db.VarChar(2)
-  dob                DateTime? @db.Date
-  relationshipstatus Int?
-  weddinganniversary DateTime? @db.Date
-  add1               String?   @db.VarChar(60)
-  add2               String?   @db.VarChar(60)
-  add3               String?   @db.VarChar(60)
-  add4               String?   @db.VarChar(60)
-  role               Int
-  fathername         String?   @db.VarChar(60)
-  aboutme            String?
-  facebook           String?   @db.VarChar(100)
-  twitter            String?   @db.VarChar(100)
-  linkedin           String?   @db.VarChar(100)
-  whatsapp           String?   @db.VarChar(20)
-  blog               String?   @db.VarChar(100)
-  tcyear             String?   @db.VarChar(60)
-  tcclass            String?   @db.VarChar(6)
-  contribution       String?
-  stateid            Int
-  organization       String?   @db.VarChar(5)
-  organizerid        Int?
-  userid             String?   @db.VarChar(30)
-  note               String?
-  status             Int
-  isdeleted          Int
-  createdby          Int
-  createdat          DateTime  @default(now()) @db.Timestamp(6)
-  updatedat          DateTime? @db.Timestamp(6)
+  uuid                String    @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String?   @db.VarChar(30)
+  password            String?   @db.VarChar(60)
+  token               String?   @db.VarChar(255)
+  gender              String?   @db.VarChar(2)
+  dob                 DateTime? @db.Date
+  add1                String?   @db.VarChar(60)
+  add2                String?   @db.VarChar(60)
+  add3                String?   @db.VarChar(60)
+  add4                String?   @db.VarChar(60)
+  role                Int
+  facebook            String?   @db.VarChar(100)
+  twitter             String?   @db.VarChar(100)
+  linkedin            String?   @db.VarChar(100)
+  whatsapp            String?   @db.VarChar(20)
+  blog                String?   @db.VarChar(100)
+  contribution        String?
+  organization        String?   @db.VarChar(5)
+  note                String?
+  status              Int
+  about_me            String?
+  alumni_id           String    @id @default(dbgenerated("('E'::text || nextval('alumni_student_alumni_id_seq'::regclass))"))
+  created_at          DateTime  @default(now()) @db.Timestamp(6)
+  created_by          Int
+  email_id            String?   @db.VarChar(60)
+  emp_code            String?   @db.VarChar(25)
+  father_name         String?   @db.VarChar(60)
+  is_deleted          Int
+  mobile_no           String?   @db.VarChar(10)
+  organizer_id        Int?
+  profile_image       String?   @db.VarChar(30)
+  public_url          String?   @db.VarChar(60)
+  relationship_status Int?
+  state_id            Int
+  tc_class            String?   @db.VarChar(6)
+  tc_year             String?   @db.VarChar(60)
+  updated_at          DateTime? @db.Timestamp(6)
+  user_id             String?   @db.VarChar(30)
+  wedding_anniversary DateTime? @db.Date
 }
 
 model alumni_students {
-  alumni_id           Int       @id(map: "alumni_students_pkey1") @default(autoincrement())
   uuid                String?   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   public_url          String?   @db.VarChar(255)
   public_display      String?   @default(dbgenerated("true")) @db.VarChar
@@ -91,6 +90,7 @@ model alumni_students {
   created_by          Int?
   created_at          DateTime? @default(now()) @db.Timestamp(6)
   updated_at          DateTime? @default(now()) @db.Timestamp(6)
+  alumni_id           String    @id @default(dbgenerated("('S'::text || nextval('alumni_student_alumni_id_seq'::regclass))"))
 }
 
 model master_schools_kvs {
