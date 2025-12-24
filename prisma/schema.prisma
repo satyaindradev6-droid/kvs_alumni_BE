@@ -144,3 +144,32 @@ model master_schools_kvs {
   is_pms_hree                String?   @db.VarChar
   classes_availability       String[]  @db.VarChar
 }
+
+model alumni_educations {
+  id         Int       @id @default(autoincrement())
+  uuid       String?   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  alumni_id  String?   @db.VarChar(30)
+  grade      String?   @db.VarChar(50)
+  program    String?   @db.VarChar(100)
+  institute  String?   @db.VarChar(150)
+  location   String?   @db.VarChar(100)
+  start_date DateTime? @db.Date
+  end_date   DateTime? @db.Date
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+  is_deleted Int?      @default(0)
+}
+
+model alumni_experiences {
+  id           Int       @id @default(autoincrement())
+  uuid         String?   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  alumni_id    String?   @db.VarChar(30)
+  designation  String?   @db.VarChar(100)
+  company_name String?   @db.VarChar(150)
+  location     String?   @db.VarChar(100)
+  start_date   DateTime? @db.Date
+  end_date     DateTime? @db.Date
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  updated_at   DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+  is_deleted   Int?      @default(0)
+}

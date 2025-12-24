@@ -14,6 +14,30 @@ export const getAllStates = async (req, res, next) => {
   }
 };
 
+// Get state by state_id
+export const getStateById = async (req, res, next) => {
+  try {
+    const { state_id } = req.params;
+    
+    if (!state_id) {
+      return res.status(400).json({ error: 'State ID is required' });
+    }
+
+    const state = await schoolModel.getStateById(state_id);
+    
+    if (!state) {
+      return res.status(404).json({ error: 'State not found' });
+    }
+
+    res.json({
+      message: 'State fetched successfully',
+      data: state
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Get schools by state_id
 export const getSchoolsByState = async (req, res, next) => {
   try {

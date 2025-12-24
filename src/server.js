@@ -5,6 +5,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import alumniRoutes from './routes/alumniRoutes.js';
 import schoolRoutes from './routes/schoolRoutes.js';
+import educationRoutes from './routes/educationRoutes.js';
+import experienceRoutes from './routes/experienceRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import prisma from './config/prisma.js';
 
@@ -69,12 +71,28 @@ app.get('/', (req, res) => {
       updateEmployeeProfileById: 'PUT /api/alumni/employee/profile/:alumni_id',
       // Other endpoints
       getAllAlumni: 'GET /api/alumni/all',
-      getAlumniById: 'GET /api/alumni/:id'
+      getAlumniById: 'GET /api/alumni/:id',
+      // Education endpoints
+      myEducations: 'GET /api/educations/me',
+      educationsByAlumni: 'GET /api/educations/alumni/:alumni_id',
+      createEducation: 'POST /api/educations',
+      getEducation: 'GET /api/educations/:id',
+      updateEducation: 'PATCH /api/educations/:id',
+      deleteEducation: 'DELETE /api/educations/:id',
+      // Experience endpoints
+      myExperiences: 'GET /api/experiences/me',
+      experiencesByAlumni: 'GET /api/experiences/alumni/:alumni_id',
+      createExperience: 'POST /api/experiences',
+      getExperience: 'GET /api/experiences/:id',
+      updateExperience: 'PATCH /api/experiences/:id',
+      deleteExperience: 'DELETE /api/experiences/:id'
     }
   });
 });
 
 app.use('/api/alumni', alumniRoutes);
+app.use('/api/educations', educationRoutes);
+app.use('/api/experiences', experienceRoutes);
 app.use('/api', schoolRoutes);
 
 // Error handler

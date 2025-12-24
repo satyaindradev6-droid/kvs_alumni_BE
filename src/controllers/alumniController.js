@@ -40,7 +40,7 @@ export const registerStudent = async (req, res, next) => {
 
     // Add profile image if uploaded
     if (req.file) {
-      validatedData.profile_image = `/uploads/${req.file.filename}`;
+      validatedData.profile_image = `/uploads/alumni_student/${req.file.filename}`;
     }
 
     // Set status to 0 for new registrations
@@ -624,12 +624,41 @@ export const uploadProfilePhoto = async (req, res, next) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const photoPath = `/uploads/${req.file.filename}`;
-    const student = await alumniModel.updateProfileImage(req.user.id, photoPath);
+    // Determine user type from ID or token
+    const userId = req.user.id;
+    const isStudent = typeof userId === 'string' && userId.startsWith('S');
+    const isEmployee = typeof userId === 'string' && userId.startsWith('E');
+
+    // Construct the correct photo path based on user type
+    let photoPath;
+    if (isStudent) {
+      photoPath = `/uploads/alumni_student/${req.file.filename}`;
+    } else if (isEmployee) {
+      photoPath = `/uploads/alumni_employee/${req.file.filename}`;
+    } else {
+      // Fallback for legacy users
+      photoPath = `/uploads/${req.file.filename}`;
+    }
+
+    // Update the profile image in the database
+    let result;
+    if (isStudent) {
+      result = await alumniModel.updateProfileImage(userId, photoPath);
+    } else if (isEmployee) {
+      result = await alumniModel.updateEmployeeProfileImage(userId, photoPath);
+    } else {
+      // Try student first, then employee
+      try {
+        result = await alumniModel.updateProfileImage(userId, photoPath);
+      } catch (error) {
+        result = await alumniModel.updateEmployeeProfileImage(userId, photoPath);
+      }
+    }
 
     res.json({
       message: 'Profile photo uploaded successfully',
-      profile_image: student.profile_image
+      profile_image: result.profile_image,
+      type: isStudent ? 'student' : isEmployee ? 'employee' : 'unknown'
     });
   } catch (error) {
     next(error);

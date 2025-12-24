@@ -20,6 +20,18 @@ const storage = multer.diskStorage({
     else if (req.path && req.path.includes('register-employee')) {
       uploadPath = path.join(__dirname, '../uploads/alumni_employee');
     }
+    // Check if it's a profile photo update route
+    else if (req.path && req.path.includes('profile/photo')) {
+      // Determine user type from JWT token
+      if (req.user && req.user.id) {
+        const userId = req.user.id;
+        if (typeof userId === 'string' && userId.startsWith('S')) {
+          uploadPath = path.join(__dirname, '../uploads/alumni_student');
+        } else if (typeof userId === 'string' && userId.startsWith('E')) {
+          uploadPath = path.join(__dirname, '../uploads/alumni_employee');
+        }
+      }
+    }
     
     // Create directory if it doesn't exist
     if (!fs.existsSync(uploadPath)) {

@@ -17,6 +17,21 @@ export const getAllStates = async () => {
   return states.sort((a, b) => a.state_name.localeCompare(b.state_name));
 };
 
+// Get state by state_id
+export const getStateById = async (state_id) => {
+  return await prisma.master_schools_kvs.findFirst({
+    where: { 
+      state_id,
+      state_id: { not: null },
+      state_name: { not: null }
+    },
+    select: {
+      state_id: true,
+      state_name: true
+    }
+  });
+};
+
 // Get schools by state_id
 export const getSchoolsByStateId = async (state_id) => {
   return await prisma.master_schools_kvs.findMany({

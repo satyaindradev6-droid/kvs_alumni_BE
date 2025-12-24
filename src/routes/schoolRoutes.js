@@ -6,6 +6,9 @@ const router = express.Router();
 // Get all states
 router.get('/states', schoolController.getAllStates);
 
+// Get state by state_id
+router.get('/states/:state_id', schoolController.getStateById);
+
 // Get all schools (with optional filters)
 router.get('/schools', schoolController.getAllSchools);
 

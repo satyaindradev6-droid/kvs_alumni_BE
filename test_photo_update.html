@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Photo Update Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        #profileImage {
+            max-width: 100%;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Profile Photo Update Test</h1>
+        
+        <div class="info">
+            <strong>Instructions:</strong>
+            <ol>
+                <li>First login to get your JWT token</li>
+                <li>Paste the token below</li>
+                <li>Select a new profile photo</li>
+                <li>Click "Upload Photo"</li>
+            </ol>
+        </div>
+
+        <!-- Login Section -->
+        <h3>Step 1: Login</h3>
+        <input type="email" id="email" placeholder="Email" value="dsatyaindra@gmail.com">
+        <input type="password" id="password" placeholder="Password" value="config#123">
+        <button onclick="login()">Login</button>
+
+        <hr>
+
+        <!-- Token Section -->
+        <h3>Step 2: JWT Token</h3>
+        <input type="text" id="token" placeholder="JWT Token (auto-filled after login)">
+
+        <hr>
+
+        <!-- Photo Upload Section -->
+        <h3>Step 3: Upload Photo</h3>
+        <input type="file" id="photoInput" accept="image/*">
+        <button onclick="uploadPhoto()">Upload Photo</button>
+
+        <div id="result"></div>
+        <img id="profileImage" style="display: none;">
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+
+        // Login function
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!email || !password) {
+                resultDiv.innerHTML = '<div class="result error">Please enter email and password</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/alumni/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        type: 'student'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store token
+                    document.getElementById('token').value = data.token;
+                    
+                    // Display current profile image if exists
+                    if (data.alumni.profile_image) {
+                        const img = document.getElementById('profileImage');
+                        img.src = `${API_BASE}${data.alumni.profile_image}`;
+                        img.style.display = 'block';
+                    }
+
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <strong>Login Successful!</strong><br>
+                            Name: ${data.alumni.name}<br>
+                            Alumni ID: ${data.alumni.alumni_id}<br>
+                            Token saved automatically
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">Login failed: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">Network error: ${error.message}</div>`;
+            }
+        }
+
+        // Upload photo function
+        async function uploadPhoto() {
+            const token = document.getElementById('token').value;
+            const fileInput = document.getElementById('photoInput');
+            const file = fileInput.files[0];
+            const resultDiv = document.getElementById('result');
+
+            if (!token) {
+                resultDiv.innerHTML = '<div class="result error">Please login first to get JWT token</div>';
+                return;
+            }
+
+            if (!file) {
+                resultDiv.innerHTML = '<div class="result error">Please select a photo</div>';
+                return;
+            }
+
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!allowedTypes.includes(file.type)) {
+                resultDiv.innerHTML = '<div class="result error">Only JPEG, PNG, and GIF images are allowed</div>';
+                return;
+            }
+
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                resultDiv.innerHTML = '<div class="result error">File size must be less than 5MB</div>';
+                return;
+            }
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('photo', file);
+
+            // Show loading
+            resultDiv.innerHTML = '<div class="result">Uploading...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/alumni/profile/photo`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Display success message
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <strong>${data.message}</strong><br>
+                            Type: ${data.type}<br>
+                            Image Path: ${data.profile_image}
+                        </div>
+                    `;
+
+                    // Display the uploaded image
+                    const img = document.getElementById('profileImage');
+                    img.src = `${API_BASE}${data.profile_image}`;
+                    img.style.display = 'block';
+
+                    // Clear file input
+                    fileInput.value = '';
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">Upload failed: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">Network error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

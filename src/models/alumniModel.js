@@ -76,10 +76,20 @@ export const findStudentByEmail = async (email_id) => {
 
 // Find student by ID
 export const findStudentById = async (alumni_id) => {
-  return await prisma.alumni_students.findUnique({
+  const student = await prisma.alumni_students.findUnique({
     where: { alumni_id: alumni_id },
     select: alumniStudentSelect,
   });
+  
+  console.log('=== RAW STUDENT DATA FROM DB ===');
+  console.log('Alumni ID:', alumni_id);
+  console.log('public_display value:', JSON.stringify(student?.public_display));
+  console.log('public_display length:', student?.public_display?.length);
+  console.log('gender value:', JSON.stringify(student?.gender));
+  console.log('gender length:', student?.gender?.length);
+  console.log('================================');
+  
+  return student;
 };
 
 // Find student by UUID
@@ -175,6 +185,15 @@ export const deleteAlumniStudent = async (alumni_id) => {
 // Update profile image
 export const updateProfileImage = async (alumni_id, imagePath) => {
   return await prisma.alumni_students.update({
+    where: { alumni_id: alumni_id },
+    data: { profile_image: imagePath, updated_at: new Date() },
+    select: { alumni_id: true, profile_image: true },
+  });
+};
+
+// Update employee profile image
+export const updateEmployeeProfileImage = async (alumni_id, imagePath) => {
+  return await prisma.alumni_employee.update({
     where: { alumni_id: alumni_id },
     data: { profile_image: imagePath, updated_at: new Date() },
     select: { alumni_id: true, profile_image: true },
